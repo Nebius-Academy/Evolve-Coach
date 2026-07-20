@@ -1,0 +1,16 @@
+{
+    "name": "evolve-coach",
+    "owner": { "name": "Nebius Academy" },
+    "plugins": [
+        {
+            "name": "coach",
+            "displayName": "Coach",
+            "source": {
+                "source": "npm",
+                "package": "@nebius-academy/coach",
+                "version": "0.1.0"
+            },
+            "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI."
+        }
+    ]
+}
