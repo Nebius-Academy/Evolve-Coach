@@ -1,6 +1,3 @@
 # Evolve Coach — Claude Code marketplace
 
-Public marketplace for the **Coach** plugin.
-
-- `.claude-plugin/marketplace.json` — the catalog, maintained here.
-- `plugins/coach/` — the plugin, CI-mirrored from Nebius's private monorepo (the source of truth). Don't edit it here; it's overwritten on each sync.
+Marketplace for the **Coach** plugin — it turns your Claude Code sessions into grounded, in-the-flow feedback on how you work with AI. The catalog is `.claude-plugin/marketplace.json`; the plugin lives under `plugins/coach/` and is updated automatically.
