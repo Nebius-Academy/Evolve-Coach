@@ -8,7 +8,7 @@
             "source": {
                 "source": "npm",
                 "package": "@nebius-academy/coach",
-                "version": "0.0.1"
+                "version": "*"
             },
             "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI."
         }
