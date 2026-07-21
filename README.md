@@ -1,3 +1,6 @@
 # Evolve Coach — Claude Code marketplace
 
-Generated mirror of the **Coach** plugin — source of truth is Nebius's private monorepo, CI-synced. Don't edit here; changes are overwritten on the next sync.
+Public marketplace for the **Coach** plugin.
+
+- `.claude-plugin/marketplace.json` — the catalog, maintained here.
+- `plugins/coach/` — the plugin, CI-mirrored from Nebius's private monorepo (the source of truth). Don't edit it here; it's overwritten on each sync.
