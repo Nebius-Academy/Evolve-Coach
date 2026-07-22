@@ -174,5 +174,3 @@ litfow_get() {
     *) return 1 ;;
   esac
 }
-
-# sync test marker f4c396c61
