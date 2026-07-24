@@ -15,10 +15,14 @@ LITFOW_STATE_DIR="${LITFOW_STATE_DIR:-$HOME/.claude/litfow}"
 # The local Claude config the account identity is read from.
 LITFOW_CLAUDE_CONFIG="${LITFOW_CLAUDE_CONFIG:-$HOME/.claude.json}"
 
-# The backend base URL. Defaults to the deployed stand; point at a local backend
-# (http://localhost:8787) for development.
-LITFOW_BACKEND_URL="${LITFOW_BACKEND_URL:-https://litfow.internal-services.stands.evolve.nebius.com}"
+# The backend base URL. Defaults to the public production backend; point at a local
+# backend (http://localhost:8787) for development.
+LITFOW_BACKEND_URL="${LITFOW_BACKEND_URL:-https://coach.evolve.nebius.com/api}"
 LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-5}"
+
+# Backend bearer credential: the plugin's sensitive `auth_token` config, which Claude Code
+# exports to hooks as CLAUDE_PLUGIN_OPTION_AUTH_TOKEN. LITFOW_AUTH_TOKEN overrides for dev.
+LITFOW_AUTH_TOKEN="${LITFOW_AUTH_TOKEN:-${CLAUDE_PLUGIN_OPTION_AUTH_TOKEN:-}}"
 
 # Identifies this surface on every turn (contract: surface.id).
 LITFOW_SURFACE="${LITFOW_SURFACE:-claude-code}"
@@ -143,8 +147,11 @@ litfow_post() {
     return $?
   fi
   local code
+  local -a auth=()
+  [ -n "${LITFOW_AUTH_TOKEN:-}" ] && auth=(-H "Authorization: Bearer ${LITFOW_AUTH_TOKEN}")
   code="$(curl -sS -m "$LITFOW_HTTP_TIMEOUT" -o /dev/null -w '%{http_code}' \
     -H 'content-type: application/json' \
+    "${auth[@]+"${auth[@]}"}" \
     --data-binary @- \
     "${LITFOW_BACKEND_URL}${path}" 2>/dev/null)" || return 1
   case "$code" in
@@ -165,7 +172,10 @@ litfow_get() {
     return $?
   fi
   local out code body
+  local -a auth=()
+  [ -n "${LITFOW_AUTH_TOKEN:-}" ] && auth=(-H "Authorization: Bearer ${LITFOW_AUTH_TOKEN}")
   out="$(curl -sS -m "$LITFOW_HTTP_TIMEOUT" -H 'accept: application/json' \
+    "${auth[@]+"${auth[@]}"}" \
     -w '\n%{http_code}' "${LITFOW_BACKEND_URL}${path}" 2>/dev/null)" || return 1
   code="${out##*$'\n'}"
   body="${out%$'\n'*}"

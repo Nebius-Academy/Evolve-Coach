@@ -15,7 +15,7 @@
 # enclosing turn's `commands`. Keyed by `turn_id` (the genuine prompt's vendor
 # id). effort / duration_ms / permission decision (allow AND deny — absent
 # means the tool ran without a gate) / sub-agent id ride the tool step they
-# describe — no second stream. `session_source` (SessionStart's source:
+# describe — no second stream. `chat_source` (SessionStart's source:
 # startup/resume/clear/compact) is stamped on every turn for lineage.
 #
 # The transcript (an internal, unstable format) is read ONLY as a fallback for
@@ -115,7 +115,7 @@ LITFOW_CAPTURE_FILTER="$LITFOW_CLEAN_DEF"'
             - ([$span[]|select(.event=="SubagentStop" or .event=="TaskCompleted")]|length)
           ),
           cwd: ($pm.payload.cwd // null),
-          session_source: $source,
+          chat_source: $source,
           # Slash commands in this span — the genuine prompt itself plus any bare
           # invocations after it (they clean to empty, so they start no turn).
           commands: (
@@ -275,7 +275,7 @@ run_capture() {
       --arg sid "$SESSION_ID" --arg uid "$USER_ID" --arg ts "$(litfow_now)" \
       --arg surface "$LITFOW_SURFACE" --arg ver "$LITFOW_SURFACE_VERSION" \
       'del(.outstanding)
-       + {session_id:$sid, captured_at:$ts}
+       + {chat_id:$sid, captured_at:$ts}
        + (if $uid != "" then {user_id:$uid} else {} end)
        + {surface: ({id:$surface} + (if $ver=="" then {} else {version:$ver} end))}')"
 

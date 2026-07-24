@@ -1,4 +1,12 @@
 {
     "name": "coach",
-    "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI."
+    "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI.",
+    "userConfig": {
+        "auth_token": {
+            "type": "string",
+            "title": "Backend access token",
+            "sensitive": true,
+            "description": "Backend access token for your organization. An administrator sets this once, organization-wide, via managed settings; individual users leave it blank."
+        }
+    }
 }
