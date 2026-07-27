@@ -18,7 +18,9 @@ LITFOW_CLAUDE_CONFIG="${LITFOW_CLAUDE_CONFIG:-$HOME/.claude.json}"
 # The backend base URL. Defaults to the public production backend; point at a local
 # backend (http://localhost:8787) for development.
 LITFOW_BACKEND_URL="${LITFOW_BACKEND_URL:-https://coach.evolve.nebius.com/api}"
-LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-5}"
+# A hang guard, not an answer budget: it must outlast the slowest answer the
+# backend allows itself, or that answer is thrown away after being paid for.
+LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-25}"
 
 # Backend bearer credential: the plugin's sensitive `auth_token` config, which Claude Code
 # exports to hooks as CLAUDE_PLUGIN_OPTION_AUTH_TOKEN. LITFOW_AUTH_TOKEN overrides for dev.
@@ -61,7 +63,7 @@ litfow_register_identity() {
           organization_id: .organizationUuid, organization_name: .organizationName,
           display_name: .displayName }' "$LITFOW_CLAUDE_CONFIG" 2>/dev/null)" || return 0
   [ -n "$payload" ] || return 0
-  printf '%s' "$payload" | litfow_post /identity >/dev/null 2>&1 || true
+  printf '%s' "$payload" | litfow_request POST /identity >/dev/null 2>&1 || true
 }
 
 # Append a debug line when LITFOW_DEBUG=1. Never writes prompt/answer text.
@@ -131,56 +133,79 @@ litfow_hooklog_append() {
   printf '%s\n' "$line" >>"$file" 2>/dev/null || true
 }
 
-# POST a JSON body (read from stdin) to the backend path in $1. Return code tells
-# the caller whether a retry can help:
-#   0  — accepted (HTTP 2xx).
-#   2  — TERMINAL rejection (HTTP 4xx, e.g. a contract mismatch). Retrying the
-#        same body can never succeed, so the caller records it and moves on.
-#   1  — transient failure (network error or HTTP 5xx). The caller retries on the
-#        next firing.
-# Overridable via LITFOW_POST_CMD (the self-test stubs the backend); the stub's
-# own exit code is passed through, so a stub can exit 2 to simulate a 4xx.
-litfow_post() {
-  local path="$1"
-  if [ -n "${LITFOW_POST_CMD:-}" ]; then
-    "$LITFOW_POST_CMD" "$path"
-    return $?
-  fi
-  local code
-  local -a auth=()
-  [ -n "${LITFOW_AUTH_TOKEN:-}" ] && auth=(-H "Authorization: Bearer ${LITFOW_AUTH_TOKEN}")
-  code="$(curl -sS -m "$LITFOW_HTTP_TIMEOUT" -o /dev/null -w '%{http_code}' \
-    -H 'content-type: application/json' \
-    "${auth[@]+"${auth[@]}"}" \
-    --data-binary @- \
-    "${LITFOW_BACKEND_URL}${path}" 2>/dev/null)" || return 1
-  case "$code" in
-    2*) return 0 ;;
-    4*) return 2 ;;
-    *) return 1 ;;
-  esac
+# The surface stamp every payload carries (contracts: surface.id / surface.version).
+litfow_surface_json() {
+  jq -cn --arg id "$LITFOW_SURFACE" --arg version "$LITFOW_SURFACE_VERSION" \
+    '{id:$id} + (if $version == "" then {} else {version:$version} end)'
 }
 
-# GET the backend path in $1 and print the response body to stdout. Returns
-# non-zero on a transport error or any non-2xx, so a reader can fail soft — a
-# user-facing view must never block or error a session. Overridable via
-# LITFOW_GET_CMD (the self-test stubs the backend).
-litfow_get() {
-  local path="$1"
-  if [ -n "${LITFOW_GET_CMD:-}" ]; then
-    "$LITFOW_GET_CMD" "$path"
+# --- Shared jq filters (capture.sh + prompt-feedback.sh) --------------------
+
+# Shared prompt cleaner — strips IDE/command/system wrappers. Used IDENTICALLY by
+# the hook-log capture pass and the transcript fallback, because model/thinking are
+# zipped onto turns BY INDEX: if the two disagree on what counts as a genuine
+# prompt (e.g. a prompt that is only <ide_diagnostics>), the fallback lands on the
+# wrong turn. Keep them in lock-step by sharing this one definition.
+LITFOW_CLEAN_DEF='
+  def clean(t):
+    (t // "")
+    | gsub("<ide_opened_file>[\\s\\S]*?</ide_opened_file>";"")
+    | gsub("<ide_selection>[\\s\\S]*?</ide_selection>";"")
+    | gsub("<ide_diagnostics>[\\s\\S]*?</ide_diagnostics>";"")
+    | gsub("<system-reminder>[\\s\\S]*?</system-reminder>";"")
+    | gsub("<command-name>[\\s\\S]*?</command-name>";"")
+    | gsub("<command-message>[\\s\\S]*?</command-message>";"")
+    | gsub("<command-args>[\\s\\S]*?</command-args>";"")
+    | gsub("<task-notification>[\\s\\S]*?</task-notification>";"")
+    | gsub("^[\\s]+";"") | gsub("[\\s]+$";"");'
+
+# The {model, thinking} of each GENUINE transcript prompt, in order. capture.sh
+# index-zips this onto its hook turns; prompt-feedback.sh takes the last entry
+# with assistant output as the chat's mode state at submit time. Uses the same
+# wrapper-cleaning so a <task-notification> is not counted as a prompt and the
+# indices align with the hook side. model + the thinking flag are the ONLY
+# fields we read from the transcript (ADR-0004) — thinking *content* is
+# deliberately left behind.
+LITFOW_TRANSCRIPT_FALLBACK="$LITFOW_CLEAN_DEF"'
+  def ptext:
+    (.message.content) as $c
+    | if ($c|type)=="string" then $c else ([$c[]?|select(.type=="text")|.text]|join("\n")) end;
+  def is_prompt: .type=="user" and ((.isMeta)!=true) and ((clean(ptext)|length)>0);
+  . as $all | ($all|length) as $n
+  | def bnd($p): ([range($p+1;$n)|select($all[.]|is_prompt)]|if length>0 then .[0] else $n end);
+    ([range(0;$n)|select($all[.]|is_prompt)]) as $P
+  | [ range(0;($P|length)) as $k
+      | $P[$k] as $i | bnd($i) as $j
+      | ($all[($i+1):$j]) as $seg
+      | { model: ([$seg[]|select(.type=="assistant")|.message.model?]|map(select(.!=null))|last),
+          thinking: (([$seg[]|select(.type=="assistant")
+                       |.message.content[]?
+                       |select(.type=="thinking" or .type=="redacted_thinking")]|length)>0) } ]'
+
+# The one way to reach the backend. $1 method, $2 path; POST reads its JSON body
+# from stdin. Prints the reply on 2xx. Returns 0 on 2xx, 2 on 4xx (terminal —
+# same body can never succeed), 1 otherwise (network / 5xx — retry on the next
+# firing). Stubbed via LITFOW_REQUEST_CMD.
+litfow_request() {
+  local method="$1" path="$2"
+  if [ -n "${LITFOW_REQUEST_CMD:-}" ]; then
+    "$LITFOW_REQUEST_CMD" "$method" "$path"
     return $?
   fi
-  local out code body
-  local -a auth=()
+  local out code cexit
+  local -a auth=() send=()
   [ -n "${LITFOW_AUTH_TOKEN:-}" ] && auth=(-H "Authorization: Bearer ${LITFOW_AUTH_TOKEN}")
-  out="$(curl -sS -m "$LITFOW_HTTP_TIMEOUT" -H 'accept: application/json' \
+  [ "$method" = "POST" ] && send=(-H 'content-type: application/json' --data-binary @-)
+  out="$(curl -s -m "$LITFOW_HTTP_TIMEOUT" --connect-timeout 2 -H 'accept: application/json' \
     "${auth[@]+"${auth[@]}"}" \
-    -w '\n%{http_code}' "${LITFOW_BACKEND_URL}${path}" 2>/dev/null)" || return 1
+    "${send[@]+"${send[@]}"}" \
+    -X "$method" -w '\n%{http_code}' "${LITFOW_BACKEND_URL}${path}" 2>/dev/null)"
+  cexit=$?
+  [ "$cexit" -ne 0 ] && return 1
   code="${out##*$'\n'}"
-  body="${out%$'\n'*}"
   case "$code" in
-    2*) printf '%s' "$body" ;;
+    2*) printf '%s' "${out%$'\n'*}"; return 0 ;;
+    4*) return 2 ;;
     *) return 1 ;;
   esac
 }

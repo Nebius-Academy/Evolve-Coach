@@ -12,7 +12,7 @@ command -v jq >/dev/null 2>&1 || { echo "LITFOW: jq is required for /status (bre
 user_id="$(litfow_user_id)"
 encoded="$(jq -rn --arg v "$user_id" '$v|@uri')"
 
-body="$(litfow_get "/status?user_id=${encoded}")" || {
+body="$(litfow_request GET "/status?user_id=${encoded}")" || {
   echo "Couldn't reach LITFOW just now — try /status again in a bit."
   exit 0
 }

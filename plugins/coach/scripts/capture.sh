@@ -40,24 +40,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Build the turns array from the slurped hook-call log ($L). See the module
 # header. null-valued optional keys are dropped (the contract rejects null).
-# Shared prompt cleaner — strips IDE/command/system wrappers. Used IDENTICALLY by
-# the hook-log capture pass and the transcript fallback, because model/thinking are
-# zipped onto turns BY INDEX: if the two disagree on what counts as a genuine
-# prompt (e.g. a prompt that is only <ide_diagnostics>), the fallback lands on the
-# wrong turn. Keep them in lock-step by sharing this one definition.
-LITFOW_CLEAN_DEF='
-  def clean(t):
-    (t // "")
-    | gsub("<ide_opened_file>[\\s\\S]*?</ide_opened_file>";"")
-    | gsub("<ide_selection>[\\s\\S]*?</ide_selection>";"")
-    | gsub("<ide_diagnostics>[\\s\\S]*?</ide_diagnostics>";"")
-    | gsub("<system-reminder>[\\s\\S]*?</system-reminder>";"")
-    | gsub("<command-name>[\\s\\S]*?</command-name>";"")
-    | gsub("<command-message>[\\s\\S]*?</command-message>";"")
-    | gsub("<command-args>[\\s\\S]*?</command-args>";"")
-    | gsub("<task-notification>[\\s\\S]*?</task-notification>";"")
-    | gsub("^[\\s]+";"") | gsub("[\\s]+$";"");'
-
+# LITFOW_CLEAN_DEF and LITFOW_TRANSCRIPT_FALLBACK come from lib.sh — shared with
+# prompt-feedback.sh, and the cleaner MUST stay identical between the capture
+# pass and the transcript fallback (they are zipped BY INDEX; see lib.sh).
 LITFOW_CAPTURE_FILTER="$LITFOW_CLEAN_DEF"'
   # Flatten the hook effort ({level} object or a bare string).
   def eff(p): (p.effort) as $e | if ($e|type)=="object" then $e.level else $e end;
@@ -151,28 +136,6 @@ LITFOW_CAPTURE_FILTER="$LITFOW_CLEAN_DEF"'
       | with_entries(select(.value!=null))
     ]'
 
-# Fallback fields from the transcript ($all): the {model, thinking} of each
-# GENUINE transcript prompt, in order — index-zipped to the hook turns. Uses the
-# same wrapper-cleaning so a <task-notification> is not counted as a prompt and
-# the indices align with the hook side. model + the thinking flag are the ONLY
-# fields we read from the transcript (ADR-0004) — thinking *content* is
-# deliberately left behind.
-LITFOW_TRANSCRIPT_FALLBACK="$LITFOW_CLEAN_DEF"'
-  def ptext:
-    (.message.content) as $c
-    | if ($c|type)=="string" then $c else ([$c[]?|select(.type=="text")|.text]|join("\n")) end;
-  def is_prompt: .type=="user" and ((.isMeta)!=true) and ((clean(ptext)|length)>0);
-  . as $all | ($all|length) as $n
-  | def bnd($p): ([range($p+1;$n)|select($all[.]|is_prompt)]|if length>0 then .[0] else $n end);
-    ([range(0;$n)|select($all[.]|is_prompt)]) as $P
-  | [ range(0;($P|length)) as $k
-      | $P[$k] as $i | bnd($i) as $j
-      | ($all[($i+1):$j]) as $seg
-      | { model: ([$seg[]|select(.type=="assistant")|.message.model?]|map(select(.!=null))|last),
-          thinking: (([$seg[]|select(.type=="assistant")
-                       |.message.content[]?
-                       |select(.type=="thinking" or .type=="redacted_thinking")]|length)>0) } ]'
-
 run_capture() {
   local INPUT="$1"
   [ "${LITFOW_DISABLED:-0}" = "1" ] && return 0
@@ -210,15 +173,17 @@ run_capture() {
   LITFOW_LOCKDIR="$LOCK"
   trap 'rmdir "${LITFOW_LOCKDIR:-}" 2>/dev/null || true' EXIT
 
-  # Base turns from the hook-call log.
+  # Base turns from the hook-call log. Read line by line and skip what does not
+  # parse: concurrent hooks can interleave one oversized append, and slurping the
+  # whole file would lose every turn of the session over that one line.
   local BASE
-  BASE="$(jq -s "$LITFOW_CAPTURE_FILTER" "$LOG" 2>/dev/null)"
+  BASE="$(jq -Rn "[inputs|fromjson?] | $LITFOW_CAPTURE_FILTER" "$LOG" 2>/dev/null)"
   [ -n "$BASE" ] && [ "$BASE" != "null" ] || return 0
 
   # Fallback: model from the transcript, merged by index.
   local TR="[]"
   if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
-    TR="$(jq -s "$LITFOW_TRANSCRIPT_FALLBACK" "$TRANSCRIPT" 2>/dev/null || echo '[]')"
+    TR="$(jq -Rn "[inputs|fromjson?] | $LITFOW_TRANSCRIPT_FALLBACK" "$TRANSCRIPT" 2>/dev/null || echo '[]')"
     [ -n "$TR" ] || TR="[]"
   fi
   # Merge the (small) transcript fallback into the (potentially large) base
@@ -273,15 +238,13 @@ run_capture() {
     # the CLI arg-length limit); only small scalars are passed as arguments.
     payload="$(printf '%s' "$turn" | jq -c \
       --arg sid "$SESSION_ID" --arg uid "$USER_ID" --arg ts "$(litfow_now)" \
-      --arg surface "$LITFOW_SURFACE" --arg ver "$LITFOW_SURFACE_VERSION" \
+      --argjson surface "$(litfow_surface_json)" \
       'del(.outstanding)
        + {chat_id:$sid, captured_at:$ts}
        + (if $uid != "" then {user_id:$uid} else {} end)
-       + {surface: ({id:$surface} + (if $ver=="" then {} else {version:$ver} end))}')"
+       + {surface:$surface}')"
 
-    # litfow_post returns 0 on 2xx, 2 on a 4xx (terminal — do not retry), and
-    # anything else on a network / 5xx failure (kept for the next firing).
-    printf '%s' "$payload" | litfow_post /turns >/dev/null 2>&1
+    printf '%s' "$payload" | litfow_request POST /turns >/dev/null 2>&1
     rc=$?
     if [ "$rc" -eq 0 ]; then
       echo "$pid" >>"$POSTED"

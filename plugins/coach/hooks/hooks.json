@@ -28,6 +28,15 @@
                         "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh UserPromptSubmit"
                     }
                 ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/prompt-feedback.sh",
+                        "timeout": 45
+                    }
+                ]
             }
         ],
         "UserPromptExpansion": [
