@@ -141,6 +141,10 @@ litfow_surface_json() {
     '{id:$id} + (if $version == "" then {} else {version:$version} end)'
 }
 
+litfow_plugin_name() {
+  jq -r '.name // "coach"' "${CLAUDE_PLUGIN_ROOT:-}/.claude-plugin/plugin.json" 2>/dev/null || echo coach
+}
+
 # --- Shared jq filters (capture.sh + prompt-feedback.sh) --------------------
 
 # Shared prompt cleaner — strips IDE/command/system wrappers. Used IDENTICALLY by
