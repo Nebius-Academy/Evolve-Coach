@@ -66,9 +66,11 @@ litfow_register_identity() {
   printf '%s' "$payload" | litfow_request POST /identity >/dev/null 2>&1 || true
 }
 
-# Append a debug line when LITFOW_DEBUG=1. Never writes prompt/answer text.
-litfow_debug() {
-  [ "${LITFOW_DEBUG:-0}" = "1" ] || return 0
+# One log line → debug.log. Level "force" always writes (a rejection stays visible
+# without LITFOW_DEBUG); "debug" writes only when LITFOW_DEBUG=1. Never logs prompt/answer text.
+litfow_log() {
+  [ "$1" = "force" ] || [ "${LITFOW_DEBUG:-0}" = "1" ] || return 0
+  shift
   printf '%s %s\n' "$(litfow_now)" "$*" >>"$LITFOW_STATE_DIR/debug.log" 2>/dev/null || true
 }
 
@@ -183,9 +185,9 @@ LITFOW_TRANSCRIPT_FALLBACK="$LITFOW_CLEAN_DEF"'
                        |select(.type=="thinking" or .type=="redacted_thinking")]|length)>0) } ]'
 
 # The one way to reach the backend. $1 method, $2 path; POST reads its JSON body
-# from stdin. Prints the reply on 2xx. Returns 0 on 2xx, 2 on 4xx (terminal —
-# same body can never succeed), 1 otherwise (network / 5xx — retry on the next
-# firing). Stubbed via LITFOW_REQUEST_CMD.
+# from stdin. Prints the reply body on 2xx and on 4xx (the 4xx body is the backend's
+# rejection reason). Returns 0 on 2xx, 2 on 4xx (terminal — same body can never
+# succeed), 1 otherwise (network / 5xx — retry on the next firing). Stubbed via LITFOW_REQUEST_CMD.
 litfow_request() {
   local method="$1" path="$2"
   if [ -n "${LITFOW_REQUEST_CMD:-}" ]; then
@@ -205,7 +207,7 @@ litfow_request() {
   code="${out##*$'\n'}"
   case "$code" in
     2*) printf '%s' "${out%$'\n'*}"; return 0 ;;
-    4*) return 2 ;;
+    4*) printf '%s' "${out%$'\n'*}"; return 2 ;;
     *) return 1 ;;
   esac
 }

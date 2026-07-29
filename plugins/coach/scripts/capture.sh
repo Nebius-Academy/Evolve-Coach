@@ -147,7 +147,7 @@ run_capture() {
   TRANSCRIPT="$(jq -r '.transcript_path // ""' <<<"$INPUT")"
   litfow_init_dirs
   LOG="$(litfow_hooklog_file "$SESSION_ID")"
-  [ -f "$LOG" ] || { litfow_debug "capture session=$SESSION_ID no-hooklog"; return 0; }
+  [ -f "$LOG" ] || { litfow_log debug "capture session=$SESSION_ID no-hooklog"; return 0; }
 
   # Serialise concurrent detached runs for this session. Stop and SessionEnd can
   # fire close together and both run detached, and the check-then-append dedup
@@ -165,7 +165,7 @@ run_capture() {
       rmdir "$LOCK" 2>/dev/null || true; continue
     fi
     tries=$((tries + 1))
-    [ "$tries" -ge "$LOCK_WAIT" ] && { litfow_debug "capture session=$SESSION_ID lock-held event=$EVENT"; return 0; }
+    [ "$tries" -ge "$LOCK_WAIT" ] && { litfow_log debug "capture session=$SESSION_ID lock-held event=$EVENT"; return 0; }
     sleep 0.1
   done
   # Released on exit. LITFOW_LOCKDIR is global on purpose: a `local` would be out
@@ -210,7 +210,7 @@ run_capture() {
 
   i=0
   while [ "$i" -lt "$count" ]; do
-    local turn pid is_last complete payload rc
+    local turn pid is_last complete payload rc resp reason
     turn="$(jq -c ".[$i]" <<<"$TURNS")"
     is_last=$([ "$((i + 1))" -eq "$count" ] && echo 1 || echo 0)
     i=$((i + 1))
@@ -244,16 +244,18 @@ run_capture() {
        + (if $uid != "" then {user_id:$uid} else {} end)
        + {surface:$surface}')"
 
-    printf '%s' "$payload" | litfow_request POST /turns >/dev/null 2>&1
+    resp="$(printf '%s' "$payload" | litfow_request POST /turns 2>/dev/null)"
     rc=$?
     if [ "$rc" -eq 0 ]; then
       echo "$pid" >>"$POSTED"
-      litfow_debug "capture session=$SESSION_ID posted turn=$pid"
+      litfow_log debug "capture session=$SESSION_ID posted turn=$pid"
     elif [ "$rc" -eq 2 ]; then
+      # 4xx is terminal; the reply is the backend's reason — logged always-on.
       echo "$pid" >>"$REJECTED"
-      litfow_debug "capture session=$SESSION_ID rejected turn=$pid (4xx, not retried)"
+      reason="$(printf '%s' "$resp" | tr '\n\t' '  ' | cut -c1-300)"
+      litfow_log force "capture session=$SESSION_ID rejected turn=$pid (4xx): $reason"
     else
-      litfow_debug "capture session=$SESSION_ID post-failed turn=$pid (will retry)"
+      litfow_log debug "capture session=$SESSION_ID post-failed turn=$pid (will retry)"
     fi
   done
 }
