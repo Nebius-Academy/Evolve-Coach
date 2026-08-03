@@ -12,19 +12,20 @@
 
 LITFOW_STATE_DIR="${LITFOW_STATE_DIR:-$HOME/.claude/litfow}"
 
-# The local Claude config the account identity is read from.
 LITFOW_CLAUDE_CONFIG="${LITFOW_CLAUDE_CONFIG:-$HOME/.claude.json}"
 
-# The backend base URL. Defaults to the public production backend; point at a local
-# backend (http://localhost:8787) for development.
+# Backend base URL — defaults to public prod; point at http://localhost:8787 for local dev.
 LITFOW_BACKEND_URL="${LITFOW_BACKEND_URL:-https://coach.evolve.nebius.com/api}"
-# A hang guard, not an answer budget: it must outlast the slowest answer the
-# backend allows itself, or that answer is thrown away after being paid for.
+# Hang guard, not an answer budget: must outlast the backend's slowest answer or it's discarded after being paid for.
 LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-25}"
 
-# Backend bearer credential: the plugin's sensitive `auth_token` config, which Claude Code
-# exports to hooks as CLAUDE_PLUGIN_OPTION_AUTH_TOKEN. LITFOW_AUTH_TOKEN overrides for dev.
-LITFOW_AUTH_TOKEN="${LITFOW_AUTH_TOKEN:-${CLAUDE_PLUGIN_OPTION_AUTH_TOKEN:-}}"
+# Backend credential — a per-org JWT (ADR-0002). No exp, so only a key rotation invalidates a stored token
+# (the backend 401s and the command path says so); rotate via the managed env (wins — no file to touch) or by replacing the file.
+LITFOW_TOKEN_FILE="${LITFOW_TOKEN_FILE:-$LITFOW_STATE_DIR/token}"
+if [ -z "${LITFOW_AUTH_TOKEN:-}" ] && [ -f "$LITFOW_TOKEN_FILE" ]; then
+  LITFOW_AUTH_TOKEN="$(tr -d '\r\n' <"$LITFOW_TOKEN_FILE" 2>/dev/null)"
+fi
+LITFOW_AUTH_TOKEN="${LITFOW_AUTH_TOKEN:-}"
 
 # Identifies this surface on every turn (contract: surface.id).
 LITFOW_SURFACE="${LITFOW_SURFACE:-claude-code}"
@@ -40,34 +41,18 @@ litfow_init_dirs() {
   mkdir -p "$LITFOW_STATE_DIR"
 }
 
-# UTC timestamp, ISO-8601.
 litfow_now() {
   date -u +%Y-%m-%dT%H:%M:%SZ
 }
 
-# user_id = the Claude account UUID from local config (opaque; backend maps it to
-# personal data). Undocumented Claude internal — empty if absent.
+# user_id: the Claude account UUID from local config (opaque; undocumented internal, empty if absent).
 litfow_user_id() {
   local id
   id="$(jq -r '.oauthAccount.accountUuid // empty' "$LITFOW_CLAUDE_CONFIG" 2>/dev/null || true)"
   printf '%s' "$id" | tr -d '\n' | cut -c1-256
 }
 
-# Register the account's PII to /identity once per session — keeps PII off the turn
-# stream. Best-effort/silent; skips when there is no account.
-litfow_register_identity() {
-  local payload
-  payload="$(jq -c '.oauthAccount
-      | select(.accountUuid != null)
-      | { user_id: .accountUuid, email: .emailAddress,
-          organization_id: .organizationUuid, organization_name: .organizationName,
-          display_name: .displayName }' "$LITFOW_CLAUDE_CONFIG" 2>/dev/null)" || return 0
-  [ -n "$payload" ] || return 0
-  printf '%s' "$payload" | litfow_request POST /identity >/dev/null 2>&1 || true
-}
-
-# One log line → debug.log. Level "force" always writes (a rejection stays visible
-# without LITFOW_DEBUG); "debug" writes only when LITFOW_DEBUG=1. Never logs prompt/answer text.
+# One line → debug.log; "force" always writes, "debug" only when LITFOW_DEBUG=1. Never logs prompt/answer text.
 litfow_log() {
   [ "$1" = "force" ] || [ "${LITFOW_DEBUG:-0}" = "1" ] || return 0
   shift
@@ -75,17 +60,8 @@ litfow_log() {
 }
 
 # --- Per-session hook-call log (hooks/<session_id>.jsonl) -------------------
-#
-# What it literally is: the log of every call Claude Code makes to our hooks.
-# hook.sh is wired to every lifecycle event and appends one line per hook call.
-# capture.sh reads it on Stop / SessionEnd / PreCompact to build contract Turns.
-# Each session gets its OWN file under
-# $LITFOW_STATE_DIR/hooks/, so one session's trace is `tail -f`-able on its own
-# and never interleaves with concurrent sessions. ON by default; set
-# LITFOW_HOOK_LOG=0 to disable. It records full prompt/answer/tool text, so it
-# is strictly local — never POSTed to the backend, never written into the repo (see
-# ../AGENTS.md hard rules). Append-only and unbounded: truncate a session's file
-# when it grows (`: > "$(litfow_hooklog_file <session>)"`).
+# One file per session (no interleaving), append-only. Full prompt/answer/tool text, so it is
+# strictly local — never POSTed, never committed (../AGENTS.md). LITFOW_HOOK_LOG=0 disables it (and capture).
 
 # Where per-session hook-call logs live.
 LITFOW_HOOK_LOG_DIR="${LITFOW_HOOK_LOG_DIR:-$LITFOW_STATE_DIR/hooks}"
@@ -104,17 +80,8 @@ litfow_hooklog_file() {
   printf '%s/%s.jsonl' "$LITFOW_HOOK_LOG_DIR" "$sid"
 }
 
-# Append one hook call {ts, session, event, payload} to that session's log file.
-# $1 is the event label; $2 is the RAW hook input (any text). The target file is
-# chosen from payload.session_id, so concurrent sessions never share a trace (the
-# `session` field is kept too, so files stay greppable when merged). Invalid JSON
-# is kept verbatim under `raw` rather than dropped; lacking a session_id it lands
-# in hooks/unknown.jsonl. Never fails the caller.
-#
-# This runs on the tool path (every PreToolUse/PostToolUse), so it is kept lean:
-# the common valid-JSON case is TWO jq invocations — one builds the wrapped line
-# (which also validates: bad input yields nothing), one reads the session back
-# out to pick the file — not the four the previous validate-then-rebuild used.
+# Append one hook call {ts, session, event, payload} to its session's log file ($1 event, $2 raw input).
+# File chosen from payload.session_id so sessions never interleave; invalid JSON kept under `raw`. Never fails the caller.
 litfow_hooklog_append() {
   litfow_hooklog_enabled || return 0
   local event="$1" input="$2" ts line session file
@@ -147,11 +114,8 @@ litfow_plugin_name() {
 
 # --- Shared jq filters (capture.sh + prompt-feedback.sh) --------------------
 
-# Shared prompt cleaner — strips IDE/command/system wrappers. Used IDENTICALLY by
-# the hook-log capture pass and the transcript fallback, because model/thinking are
-# zipped onto turns BY INDEX: if the two disagree on what counts as a genuine
-# prompt (e.g. a prompt that is only <ide_diagnostics>), the fallback lands on the
-# wrong turn. Keep them in lock-step by sharing this one definition.
+# Shared prompt cleaner (strips IDE/command/system wrappers). Capture and the transcript fallback
+# MUST use it identically — model/thinking zip onto turns by index, so any drift misaligns them.
 LITFOW_CLEAN_DEF='
   def clean(t):
     (t // "")
@@ -165,13 +129,8 @@ LITFOW_CLEAN_DEF='
     | gsub("<task-notification>[\\s\\S]*?</task-notification>";"")
     | gsub("^[\\s]+";"") | gsub("[\\s]+$";"");'
 
-# The {model, thinking} of each GENUINE transcript prompt, in order. capture.sh
-# index-zips this onto its hook turns; prompt-feedback.sh takes the last entry
-# with assistant output as the chat's mode state at submit time. Uses the same
-# wrapper-cleaning so a <task-notification> is not counted as a prompt and the
-# indices align with the hook side. model + the thinking flag are the ONLY
-# fields we read from the transcript (ADR-0004) — thinking *content* is
-# deliberately left behind.
+# {model, thinking} of each genuine transcript prompt, in order (index-aligned with the hook turns).
+# model + the thinking flag are the ONLY fields read from the transcript — thinking content is left behind (ADR-0004).
 LITFOW_TRANSCRIPT_FALLBACK="$LITFOW_CLEAN_DEF"'
   def ptext:
     (.message.content) as $c
@@ -188,10 +147,8 @@ LITFOW_TRANSCRIPT_FALLBACK="$LITFOW_CLEAN_DEF"'
                        |.message.content[]?
                        |select(.type=="thinking" or .type=="redacted_thinking")]|length)>0) } ]'
 
-# The one way to reach the backend. $1 method, $2 path; POST reads its JSON body
-# from stdin. Prints the reply body on 2xx and on 4xx (the 4xx body is the backend's
-# rejection reason). Returns 0 on 2xx, 2 on 4xx (terminal — same body can never
-# succeed), 1 otherwise (network / 5xx — retry on the next firing). Stubbed via LITFOW_REQUEST_CMD.
+# The one way to reach the backend ($1 method, $2 path; POST body on stdin). Returns 0 on 2xx,
+# 2 on 4xx (terminal — same body never succeeds), 1 otherwise (network/5xx — retry). Stubbed via LITFOW_REQUEST_CMD.
 litfow_request() {
   local method="$1" path="$2"
   if [ -n "${LITFOW_REQUEST_CMD:-}" ]; then
