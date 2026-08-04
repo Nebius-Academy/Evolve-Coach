@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# Shared helpers for the LITFOW capture hooks.
+# Shared helpers for the Evolve Coach capture hooks.
 #
 # Sourced by hook.sh (every event) and capture.sh (Stop/SessionEnd/PreCompact).
 # Pure bash + jq + curl. macOS-only PoC.

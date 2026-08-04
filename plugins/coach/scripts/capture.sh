@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# LITFOW — hook-first turn capture (see ../../docs/adr/0004-turn-capture.md).
+# Evolve Coach — hook-first turn capture (see ../../docs/adr/0004-turn-capture.md).
 #
 # The single capture path (superseding the old transcript extractor and the
 # metadata-only event stream — see the ADR).
