@@ -17,7 +17,7 @@ LITFOW_CLAUDE_CONFIG="${LITFOW_CLAUDE_CONFIG:-$HOME/.claude.json}"
 # Backend base URL — defaults to public prod; point at http://localhost:8787 for local dev.
 LITFOW_BACKEND_URL="${LITFOW_BACKEND_URL:-https://coach.evolve.nebius.com/api}"
 # Hang guard, not an answer budget: must outlast the backend's slowest answer or it's discarded after being paid for.
-LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-25}"
+LITFOW_HTTP_TIMEOUT="${LITFOW_HTTP_TIMEOUT:-40}"
 
 # Backend credential — a per-org JWT (ADR-0002). No exp, so only a key rotation invalidates a stored token
 # (the backend 401s and the command path says so); rotate via the managed env (wins — no file to touch) or by replacing the file.
