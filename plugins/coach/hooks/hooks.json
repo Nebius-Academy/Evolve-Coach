@@ -46,6 +46,15 @@
                         "timeout": 30
                     }
                 ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/dashboard.sh",
+                        "timeout": 30
+                    }
+                ]
             }
         ],
         "UserPromptExpansion": [
