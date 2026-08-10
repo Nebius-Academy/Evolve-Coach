@@ -1,4 +1,5 @@
 {
     "name": "coach",
-    "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI."
+    "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI.",
+    "author": { "name": "Nebius Academy" }
 }
