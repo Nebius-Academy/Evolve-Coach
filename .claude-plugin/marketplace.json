@@ -1,5 +1,6 @@
 {
     "name": "evolve-coach",
+    "description": "Evolve Coach by Nebius Academy — helps professionals work better with AI tools, learning from their real work.",
     "owner": { "name": "Nebius Academy" },
     "plugins": [
         {
@@ -10,7 +11,8 @@
                 "url": "https://github.com/Nebius-Academy/Evolve-Coach.git",
                 "path": "plugins/coach"
             },
-            "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI."
+            "description": "Learn to work better with AI — turns your real Claude Code sessions into grounded, in-the-flow feedback on how you work with the AI.",
+            "homepage": "https://github.com/Nebius-Academy/Evolve-Coach"
         }
     ]
 }
