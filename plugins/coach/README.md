@@ -32,8 +32,13 @@ Organization settings → Claude Code → Managed settings:
     }
   },
   "enabledPlugins": { "coach@evolve-coach": true },
-  "env": { "EVOLVE_COACH_AUTH_TOKEN": "<your-org-jwt>" }
+  "env": {
+    "EVOLVE_COACH_AUTH_TOKEN": "<your-org-jwt>",
+    "FORCE_AUTOUPDATE_PLUGINS": "1"
+  }
 }
 ```
 
 `enabledPlugins` installs the plugin for everyone in the organization by default.
+
+`autoUpdate` is what keeps everyone current: Claude Code refreshes the marketplace shortly after a session starts and installs the newest build, which the next session loads. `FORCE_AUTOUPDATE_PLUGINS` keeps that true in an organization that pins Claude Code itself with `DISABLE_AUTOUPDATER` — without it, pinning Claude Code silently freezes the plugin too.
