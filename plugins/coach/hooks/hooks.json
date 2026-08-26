@@ -31,7 +31,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" prompt-feedback 2>/dev/null || true",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" on-demand-feedback 2>/dev/null || true",
                         "timeout": 45
                     }
                 ]
@@ -103,6 +103,15 @@
                     {
                         "type": "command",
                         "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events Stop 2>/dev/null || true"
+                    }
+                ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" automatic-feedback 2>/dev/null || true",
+                        "timeout": 45
                     }
                 ]
             }
