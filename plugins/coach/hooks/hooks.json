@@ -16,6 +16,14 @@
                         "command": "(curl -fsSL \"https://evolve-coach-f188dq7s.s3.eu-central-1.amazonaws.com/cli/install.sh\" | sh >/dev/null 2>&1 &)"
                     }
                 ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login-notice 2>/dev/null || true"
+                    }
+                ]
             }
         ],
         "UserPromptSubmit": [
@@ -51,6 +59,15 @@
                         "type": "command",
                         "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" dashboard 2>/dev/null || true",
                         "timeout": 30
+                    }
+                ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login 2>/dev/null || true",
+                        "timeout": 120
                     }
                 ]
             }
