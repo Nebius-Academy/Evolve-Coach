@@ -39,6 +39,6 @@ Organization settings → Claude Code → Managed settings:
 }
 ```
 
-`enabledPlugins` installs the plugin for everyone in the organization by default.
+`enabledPlugins` installs the plugin for everyone in the organization by default. `EVOLVE_COACH_AUTH_TOKEN` is the legacy org JWT: it no longer stands in for logging in — until a person runs `/coach:login` the coach does nothing on their machine.
 
 `autoUpdate` is what keeps everyone current: Claude Code refreshes the marketplace shortly after a session starts and installs the newest build, which the next session loads. `FORCE_AUTOUPDATE_PLUGINS` keeps that true in an organization that pins Claude Code itself with `DISABLE_AUTOUPDATER` — without it, pinning Claude Code silently freezes the plugin too.

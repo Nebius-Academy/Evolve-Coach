@@ -1,5 +1,5 @@
 ---
-description: Connect this machine to Evolve Coach (sign in)
+description: Log in to Evolve Coach on this machine
 ---
 
 Reply with the message provided for this turn, verbatim — nothing else.
