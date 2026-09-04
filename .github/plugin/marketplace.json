@@ -1,0 +1,15 @@
+{
+    "name": "evolve-coach",
+    "metadata": {
+        "description": "Evolve Coach by Nebius Academy — helps professionals work better with AI tools, learning from their real work."
+    },
+    "owner": { "name": "Nebius Academy" },
+    "plugins": [
+        {
+            "name": "coach",
+            "source": "./plugins/coach-copilot",
+            "description": "Learn to work better with AI — turns your real Copilot CLI sessions into grounded, in-the-flow feedback on how you work with the AI.",
+            "homepage": "https://github.com/Nebius-Academy/Evolve-Coach"
+        }
+    ]
+}

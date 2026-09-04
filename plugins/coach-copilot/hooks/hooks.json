@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "hooks": {
+        "sessionStart": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events sessionStart 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            },
+            {
+                "type": "command",
+                "bash": "(curl -fsSL \"https://evolve-coach-f188dq7s.s3.eu-central-1.amazonaws.com/cli/install.sh\" | EVOLVE_COACH_BIN_DIR=\"${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin\" sh >/dev/null 2>&1 &)",
+                "timeoutSec": 10
+            },
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" login-notice 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 10
+            }
+        ],
+        "userPromptSubmitted": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events userPromptSubmitted 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            },
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" automatic-feedback 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 45
+            }
+        ],
+        "postToolUse": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events postToolUse 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            }
+        ],
+        "postToolUseFailure": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events postToolUseFailure 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            }
+        ],
+        "agentStop": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events agentStop 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            }
+        ],
+        "sessionEnd": [
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events sessionEnd 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 20
+            }
+        ]
+    }
+}
