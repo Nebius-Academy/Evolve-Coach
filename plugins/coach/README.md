@@ -6,7 +6,7 @@ Coaching on how you work with AI. It gives feedback in the flow.
 
 - `/coach:status` — your AI profile and the microskills you're climbing toward.
 - `/coach:prompt-feedback [draft]` — pass a prompt you have written but not sent and get feedback on it, read in the chat you're in; nothing acts on it. Run it alone for feedback on your last prompt. Start the message with the command.
-- `/coach:dashboard` — opens the management dashboard in your browser and prints a one-time link (valid about two minutes).
+- `/coach:dashboard` — opens the management dashboard in your browser; it reuses your `/coach:login`, so log in first.
 
 ## Requirements
 
