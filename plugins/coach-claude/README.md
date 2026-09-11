@@ -5,18 +5,23 @@ Coaching on how you work with AI. It gives feedback in the flow.
 ## Commands
 
 - `/coach:status` — your AI profile and the microskills you're climbing toward.
-- `/coach:prompt-feedback [draft]` — pass a prompt you have written but not sent and get feedback on it, read in the chat you're in; nothing acts on it. Run it alone for feedback on your last prompt. Start the message with the command.
+- `/coach:prompt-feedback [draft]` — pass a prompt you have written but not sent and get feedback on it, read in the
+  chat you're in; nothing acts on it. Run it alone for feedback on your last prompt. Start the message with the command.
 - `/coach:dashboard` — opens the management dashboard in your browser; it reuses your `/coach:login`, so log in first.
 
 ## Requirements
 
-- macOS or Linux, on `darwin-arm64`, `darwin-x64`, `linux-x64` or `linux-arm64`. Linux binaries are glibc; musl is not supported.
-- Claude Code in the terminal, in the VS Code extension, or in the desktop app — the desktop app needs Claude Code installed separately.
+- macOS or Linux, on `darwin-arm64`, `darwin-x64`, `linux-x64` or `linux-arm64`. Linux binaries are glibc; musl is not
+  supported.
+- Claude Code in the terminal, in the VS Code extension, or in the desktop app — the desktop app needs Claude Code
+  installed separately.
 - A Claude Team or Enterprise plan, and a per-organization access token.
 
 ## Setup
 
-An organization admin sets this up once; org-wide setup needs Owner. Marketplace `evolve-coach`, plugin `coach`. Your organization is issued a per-organization JWT at onboarding — the plugin sends it on every request, and without it the backend refuses the data.
+An organization admin sets this up once; org-wide setup needs Owner. Marketplace `evolve-coach`, plugin `coach`. Your
+organization is issued a per-organization JWT at onboarding — the plugin sends it on every request, and without it the
+backend refuses the data.
 
 Organization settings → Claude Code → Managed settings:
 
@@ -39,6 +44,11 @@ Organization settings → Claude Code → Managed settings:
 }
 ```
 
-`enabledPlugins` installs the plugin for everyone in the organization by default. `EVOLVE_COACH_AUTH_TOKEN` is the legacy org JWT: it no longer stands in for logging in — until a person runs `/coach:login` the coach does nothing on their machine.
+`enabledPlugins` installs the plugin for everyone in the organization by default. `EVOLVE_COACH_AUTH_TOKEN` is the
+legacy org JWT: it no longer stands in for logging in — until a person runs `/coach:login` the coach does nothing on
+their machine.
 
-`autoUpdate` is what keeps everyone current: Claude Code refreshes the marketplace shortly after a session starts and installs the newest build, which the next session loads. `FORCE_AUTOUPDATE_PLUGINS` keeps that true in an organization that pins Claude Code itself with `DISABLE_AUTOUPDATER` — without it, pinning Claude Code silently freezes the plugin too.
+`autoUpdate` is what keeps everyone current: Claude Code refreshes the marketplace shortly after a session starts and
+installs the newest build, which the next session loads. `FORCE_AUTOUPDATE_PLUGINS` keeps that true in an organization
+that pins Claude Code itself with `DISABLE_AUTOUPDATER` — without it, pinning Claude Code silently freezes the plugin
+too.
