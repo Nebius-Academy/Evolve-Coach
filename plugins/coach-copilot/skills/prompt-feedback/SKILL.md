@@ -10,5 +10,4 @@ Execute this command with the shell tool, exactly once:
 EVOLVE_COACH_SURFACE=copilot "${EVOLVE_COACH_BIN:-$HOME/.copilot/evolve-coach/bin/evolve-coach-cli}" on-demand-feedback
 ```
 
-Do not print the command itself. Reply with the command's stdout verbatim — every line, nothing else. Do not summarize,
-reformat, or add commentary.
+Do not print the command itself. Reply with the command's stdout verbatim — every line, nothing else. Do not summarize, reformat, or add commentary.
