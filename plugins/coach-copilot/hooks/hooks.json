@@ -56,6 +56,12 @@
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events agentStop 2>/dev/null || true",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
+            },
+            {
+                "type": "command",
+                "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" complete-login 2>/dev/null || true",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 120
             }
         ],
         "sessionEnd": [
