@@ -67,7 +67,7 @@
                     {
                         "type": "command",
                         "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login 2>/dev/null || true",
-                        "timeout": 120
+                        "timeout": 10
                     }
                 ]
             }
@@ -129,6 +129,15 @@
                         "type": "command",
                         "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" automatic-feedback 2>/dev/null || true",
                         "timeout": 45
+                    }
+                ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" complete-login 2>/dev/null || true",
+                        "timeout": 120
                     }
                 ]
             }
