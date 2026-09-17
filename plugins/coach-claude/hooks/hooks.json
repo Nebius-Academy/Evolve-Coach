@@ -67,7 +67,7 @@
                     {
                         "type": "command",
                         "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login 2>/dev/null || true",
-                        "timeout": 10
+                        "timeout": 45
                     }
                 ]
             }
