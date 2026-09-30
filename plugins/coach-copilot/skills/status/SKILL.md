@@ -1,6 +1,6 @@
 ---
 name: status
-description: Show your Evolve Coach status — the microskills toward your next AI profile.
+description: Show your Evolve Coach status — the behaviors toward your next AI profile.
 allowed-tools: shell
 ---
 
