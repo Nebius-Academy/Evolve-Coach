@@ -10,7 +10,7 @@ Coaching on how you work with AI. It gives feedback in the flow.
 
 ## Requirements
 
-- macOS or Linux, on `darwin-arm64`, `darwin-x64`, `linux-x64` or `linux-arm64`. Linux binaries are glibc; musl is not supported.
+- macOS, Linux or Windows. Windows on ARM runs the x64 build under emulation.
 - Claude Code in the terminal, in the VS Code extension, or in the desktop app — the desktop app needs Claude Code installed separately.
 - A Claude Team or Enterprise plan, and a per-organization access token.
 
