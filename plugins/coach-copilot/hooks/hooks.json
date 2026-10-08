@@ -5,7 +5,7 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events sessionStart 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events sessionStart 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events sessionStart 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             },
@@ -18,7 +18,7 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" login-notice 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) login-notice 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) login-notice 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 10
             }
@@ -27,14 +27,14 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events userPromptSubmitted 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events userPromptSubmitted 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events userPromptSubmitted 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             },
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" automatic-feedback 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) automatic-feedback 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) automatic-feedback 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 45
             }
@@ -43,7 +43,7 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events postToolUse 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events postToolUse 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events postToolUse 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             }
@@ -52,7 +52,7 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events postToolUseFailure 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events postToolUseFailure 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events postToolUseFailure 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             }
@@ -61,14 +61,14 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events agentStop 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events agentStop 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events agentStop 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             },
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" complete-login 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) complete-login 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) complete-login 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 120
             }
@@ -77,7 +77,7 @@
             {
                 "type": "command",
                 "bash": "\"${EVOLVE_COACH_BIN:-${COPILOT_HOME:-$HOME/.copilot}/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events sessionEnd 2>/dev/null || true",
-                "powershell": "[Console]::In.ReadToEnd() | & ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events sessionEnd 2>$null; exit 0",
+                "powershell": "& ($env:EVOLVE_COACH_BIN ?? (Join-Path ($env:COPILOT_HOME ?? (Join-Path $HOME .copilot)) evolve-coach/bin/evolve-coach-cli.exe)) capture-chat-events sessionEnd 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 20
             }
