@@ -12,6 +12,7 @@ Coaching on how you work with AI. It gives feedback in the flow.
 
 - macOS, Linux or Windows. Windows on ARM runs the x64 build under emulation.
 - Claude Code in the terminal, in the VS Code extension, or in the desktop app — the desktop app needs Claude Code installed separately.
+- [Git](https://git-scm.com/downloads) on every machine. Claude Code [installs the plugin with it](https://code.claude.com/docs/en/plugins/host-marketplace#host-your-marketplace).
 - A Claude Team or Enterprise plan, and a per-organization access token.
 
 ## Setup
