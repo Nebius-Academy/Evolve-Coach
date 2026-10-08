@@ -5,7 +5,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events SessionStart 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events SessionStart 2>/dev/null || true"
                     }
                 ]
             },
@@ -21,7 +21,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login-notice 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" login-notice 2>/dev/null || true"
                     }
                 ]
             }
@@ -31,7 +31,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events UserPromptSubmit 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events UserPromptSubmit 2>/dev/null || true"
                     }
                 ]
             },
@@ -39,7 +39,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" on-demand-feedback 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" on-demand-feedback 2>/dev/null || true",
                         "timeout": 45
                     }
                 ]
@@ -48,7 +48,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" status 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" status 2>/dev/null || true",
                         "timeout": 30
                     }
                 ]
@@ -57,7 +57,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" dashboard 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" dashboard 2>/dev/null || true",
                         "timeout": 30
                     }
                 ]
@@ -66,7 +66,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" login 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" login 2>/dev/null || true",
                         "timeout": 45
                     }
                 ]
@@ -78,7 +78,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events PostToolUse 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events PostToolUse 2>/dev/null || true"
                     }
                 ]
             }
@@ -89,7 +89,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events PostToolUseFailure 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events PostToolUseFailure 2>/dev/null || true"
                     }
                 ]
             }
@@ -99,7 +99,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events MessageDisplay 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events MessageDisplay 2>/dev/null || true"
                     }
                 ]
             }
@@ -109,7 +109,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events SubagentStop 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events SubagentStop 2>/dev/null || true"
                     }
                 ]
             }
@@ -119,7 +119,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events Stop 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events Stop 2>/dev/null || true"
                     }
                 ]
             },
@@ -127,7 +127,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" automatic-feedback 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" automatic-feedback 2>/dev/null || true",
                         "timeout": 45
                     }
                 ]
@@ -136,7 +136,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" complete-login 2>/dev/null || true",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" complete-login 2>/dev/null || true",
                         "timeout": 120
                     }
                 ]
@@ -147,7 +147,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events StopFailure 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events StopFailure 2>/dev/null || true"
                     }
                 ]
             }
@@ -157,7 +157,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events PreCompact 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events PreCompact 2>/dev/null || true"
                     }
                 ]
             }
@@ -167,7 +167,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"${EVOLVE_COACH_BIN:-$HOME/.claude/evolve-coach/bin/evolve-coach-cli}\" capture-chat-events SessionEnd 2>/dev/null || true"
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" capture-chat-events SessionEnd 2>/dev/null || true"
                     }
                 ]
             }
