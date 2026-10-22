@@ -48,6 +48,15 @@
                 "hooks": [
                     {
                         "type": "command",
+                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" user-feedback 2>/dev/null || true",
+                        "timeout": 45
+                    }
+                ]
+            },
+            {
+                "hooks": [
+                    {
+                        "type": "command",
                         "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" status 2>/dev/null || true",
                         "timeout": 30
                     }
