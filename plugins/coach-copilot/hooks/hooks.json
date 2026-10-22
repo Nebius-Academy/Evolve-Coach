@@ -37,6 +37,13 @@
                 "powershell": "& (Join-Path $HOME .evolve-coach/bin/evolve-coach-cli.exe) automatic-feedback 2>$null; exit 0",
                 "env": { "EVOLVE_COACH_SURFACE": "copilot" },
                 "timeoutSec": 45
+            },
+            {
+                "type": "command",
+                "bash": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" user-feedback 2>/dev/null || true",
+                "powershell": "& (Join-Path $HOME .evolve-coach/bin/evolve-coach-cli.exe) user-feedback 2>$null; exit 0",
+                "env": { "EVOLVE_COACH_SURFACE": "copilot" },
+                "timeoutSec": 45
             }
         ],
         "postToolUse": [
