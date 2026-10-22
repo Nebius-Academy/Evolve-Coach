@@ -57,15 +57,6 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" status 2>/dev/null || true",
-                        "timeout": 30
-                    }
-                ]
-            },
-            {
-                "hooks": [
-                    {
-                        "type": "command",
                         "command": "\"$HOME/.evolve-coach/bin/evolve-coach-cli\" dashboard 2>/dev/null || true",
                         "timeout": 30
                     }
