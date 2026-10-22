@@ -1,7 +1,7 @@
 {
     "name": "coach",
     "description": "Learn to work better with AI — Evolve Coach for GitHub Copilot.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": { "name": "Nebius Academy" },
     "skills": "skills/",
     "hooks": "hooks/hooks.json"
