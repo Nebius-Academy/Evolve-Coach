@@ -1,6 +1,6 @@
 ---
 name: prompt-feedback
-description: Get Evolve Coach feedback on your last prompt.
+description: Evolve Coach feedback on a draft prompt, or on your last prompt.
 allowed-tools: shell
 ---
 
